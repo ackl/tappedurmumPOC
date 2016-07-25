@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style type="text/css" media="screen">
+        body { background: #353535; }
+
+        ul { float: left; list-style-type: none; }
+
+        li {
+            background: #4c4c4c;
+            position: relative;
+            padding: 10px;
+            color: white;
+            border-width: 1px 0 0;
+            border-style: solid;
+            border-color: #6b6b6b;
+        }
+
+        li:first-child { border: 0; }
+
+        li img {
+            position: absolute;
+            top: 0; left: 300px;
+            z-index: 1;
+        }
+
+        li span {
+            margin-left: 5px;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            font-size: 12px;
+            display: inline-block;
+            text-align: center;
+            background: #efefef;
+            color: black;
+        }
+
+        li span.W { background: #FFFFDE; }
+        li span.B { background: #C4B8B6; }
+        li span.R { background: #F8A287; }
+        li span.U { background: #9FDDF9; }
+        li span.G { background: #89D3AA; }
+    </style>
+</head>
+<body>
+    <ul></ul>
+    <script type="text/javascript" charset="utf-8">
+        const colours = ['W', 'B', 'R', 'U', 'G'];
+
+        fetch('EMN.json').then(res => {
+            return res.json();
+        }).then(res => {
+            let cards = res.cards;
+            let $ul = document.querySelector('ul');
+
+            cards.forEach(card => {
+                let $li = document.createElement('li');
+                $li.textContent = card.name;
+                $li.dataset.multiverseid = card.multiverseid;
+
+                if (card.manaCost) {
+                    let cost = card.manaCost.split('{');
+                    cost.shift();
+
+                    cost.forEach(c => {
+                        let $colour = document.createElement('span');
+                        $colour.textContent = c[0];
+                        if (colours.includes(c[0])) {
+                            $colour.className = c[0];
+                        }
+
+                        $li.appendChild($colour);
+                    });
+                }
+
+                $li.addEventListener('mouseenter', e => {
+                    let $img = document.createElement('img');
+                    $img.src = `http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=${e.target.dataset.multiverseid}&type=card`;
+                    e.target.appendChild($img);
+                });
+
+                $li.addEventListener('mouseleave', e => {
+                    e.target.querySelector('img').remove();
+                });
+
+                $ul.appendChild($li);
+            });
+        });
+    </script>
+</body>
+</html>
